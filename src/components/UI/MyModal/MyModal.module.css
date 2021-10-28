@@ -1,0 +1,22 @@
+.myMdl{
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.myMdl_content{
+    padding: 25px;
+    min-width: 450px;
+    background-color: white;
+    border-radius: 16px;
+}
+
+.myMdl.active{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

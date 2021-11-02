@@ -8,12 +8,16 @@ import MyButton from "./components/UI/MyButton/MyButton";
 import {usePosts} from "./hooks/usePosts";
 import PostService from "./API/PostService";
 import MyLoader from "./components/UI/MyLoader/MyLoader";
+import {useFetching} from "./hooks/useFetching";
 
 function App() {
     const [posts, setPosts] = useState([])
     const [filter, setFilter] = useState({sort:'',query:''});
     const [modal, setModal] = useState(false);
-    const [isPostsLoading, setIsPostsLoading] = useState(false);
+    const [fetchPosts, isPostsLoading, postError ] = useFetching( async ()=>{
+        const posts = await PostService.getAll();
+        setPosts(posts);
+    })
 
     const sortedAndSearchPosts = usePosts(posts,filter.sort,filter.query);
 
@@ -30,15 +34,7 @@ function App() {
         setPosts(posts.filter(p => p.id !== post.id))
     }
 
-    async function fetchPosts() {
-        setIsPostsLoading(true);
-        setTimeout(async ()=> {
-            const posts = await PostService.getAll();
-            setPosts(posts);
-            setIsPostsLoading(false);
-        },1000)
 
-    }
     return (
         <div className="App">
             <button style={{margin:'10px'}} onClick={fetchPosts}>GET POSTS</button>
@@ -51,11 +47,14 @@ function App() {
             <hr style={{margin:'15px 0'}}/>
 
             <PostsFilter filter={filter} setFilter={setFilter}/>
+
+            {postError
+            ? <h1 style={{textAlign:'center'}}>Произошла ошибка: <span style={{color:'red'}}>{postError}</span></h1>:
+            null}
+
             {isPostsLoading
             ? <div style={{display:'flex',justifyContent:'center', marginTop:'50px'}}> <MyLoader/> </div>
             : <PostList remove={removePost} posts={sortedAndSearchPosts} title={'Посты про JS'}/>}
-
-
         </div>
     );
 }

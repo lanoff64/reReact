@@ -6,7 +6,7 @@ import PostsFilter from "./components/PostsFilter";
 import MyModal from "./components/UI/MyModal/MyModal";
 import MyButton from "./components/UI/MyButton/MyButton";
 import {usePosts} from "./hooks/usePosts";
-import axios from "axios";
+import PostService from "./API/PostService";
 
 function App() {
     const [posts, setPosts] = useState([])
@@ -30,8 +30,8 @@ function App() {
     }
 
     async function fetchPosts() {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
-        setPosts(response.data);
+        const posts = await PostService.getAll();
+        setPosts(posts);
     }
     return (
         <div className="App">

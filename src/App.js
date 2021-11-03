@@ -9,21 +9,31 @@ import {usePosts} from "./hooks/usePosts";
 import PostService from "./API/PostService";
 import MyLoader from "./components/UI/MyLoader/MyLoader";
 import {useFetching} from "./hooks/useFetching";
+import Pagination from "./components/Pagination";
+import {getPagesArray, getPagesCount} from "./utils/pages";
 
 function App() {
     const [posts, setPosts] = useState([])
     const [filter, setFilter] = useState({sort:'',query:''});
     const [modal, setModal] = useState(false);
+    const [limit, setLimit] = useState(10);
+    const [page, setPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
     const [fetchPosts, isPostsLoading, postError ] = useFetching( async ()=>{
-        const posts = await PostService.getAll();
-        setPosts(posts);
+        const response = await PostService.getAll(limit, page);
+        setPosts(response.data);
+        const totalCount =  response.headers['x-total-count'];
+        setTotalPage(getPagesCount(totalCount, limit));
     })
+
+    const pagesArray = getPagesArray(totalPage);
+
 
     const sortedAndSearchPosts = usePosts(posts,filter.sort,filter.query);
 
     useEffect(()=>{
         fetchPosts()
-    },[])
+    },[page])
 
     const createPost = (newPost) => {
         setPosts([...posts, newPost]);
@@ -34,6 +44,9 @@ function App() {
         setPosts(posts.filter(p => p.id !== post.id))
     }
 
+    const changePage = (p) => {
+        setPage(p);
+    }
 
     return (
         <div className="App">
@@ -49,12 +62,12 @@ function App() {
             <PostsFilter filter={filter} setFilter={setFilter}/>
 
             {postError
-            ? <h1 style={{textAlign:'center'}}>Произошла ошибка: <span style={{color:'red'}}>{postError}</span></h1>:
-            null}
-
+                ? <h1 style={{textAlign:'center'}}>Произошла ошибка: <span style={{color:'red'}}>{postError}</span></h1>:
+                null}
+            <Pagination pagesArray={pagesArray} page={page} changePage={changePage} />
             {isPostsLoading
-            ? <div style={{display:'flex',justifyContent:'center', marginTop:'50px'}}> <MyLoader/> </div>
-            : <PostList remove={removePost} posts={sortedAndSearchPosts} title={'Посты про JS'}/>}
+                ? <div style={{display:'flex',justifyContent:'center', marginTop:'50px'}}> <MyLoader/> </div>
+                : <PostList remove={removePost} posts={sortedAndSearchPosts} title={'Посты про JS'}/>}
         </div>
     );
 }

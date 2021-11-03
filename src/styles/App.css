@@ -39,3 +39,26 @@
     transform: translateX(-250px);
     transition: all 500ms ease-in;
 }
+
+.page {
+    border: 1px solid teal;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+.page:hover{
+    background-color: grey;
+}
+.page:active{
+    background-color: black;
+    color: white;
+}
+
+.page__current {
+    border: 1px solid orange;
+    background-color: orange;
+    font-weight: bold;
+}
+.page__current:hover{
+    background-color: orange;
+}
